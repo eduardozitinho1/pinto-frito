@@ -1,0 +1,8 @@
+{
+  "name": "Restaurante Pinto Frito",
+  "description": "Restaurante Pinto Frito - Frango frito artesanal marinado por 24h em 11 especiarias secretas, cardápio interativo, reservas de mesas online e pedidos rápidos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
