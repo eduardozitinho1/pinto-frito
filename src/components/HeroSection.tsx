@@ -113,7 +113,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <div className="relative rounded-3xl overflow-hidden border-2 border-amber-500/30 shadow-2xl bg-stone-900 group">
                 <img
                   src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=1000&q=80"
-                  alt="Balde de Frango Frito artesanal ultra crocante com pedaços dourados do Restaurante Pinto Frito"
+                  alt="Pinto Frito - Balde de Frango Frito artesanal ultra crocante com pedaços dourados do Restaurante Pinto Frito"
+                  fetchPriority="high"
+                  loading="eager"
+                  decoding="async"
+                  width="1000"
+                  height="750"
                   className="w-full h-[380px] sm:h-[460px] object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 />
                 
