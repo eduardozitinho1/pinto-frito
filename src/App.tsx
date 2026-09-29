@@ -6,6 +6,7 @@ import { InteractiveMenu } from './components/InteractiveMenu';
 import { ReservationSection } from './components/ReservationSection';
 import { ReviewsSection } from './components/ReviewsSection';
 import { GoogleMapsSection } from './components/GoogleMapsSection';
+import { FAQSection } from './components/FAQSection';
 import { CartModal } from './components/CartModal';
 import { AdminAuthGate } from './components/AdminAuthGate';
 import { Footer } from './components/Footer';
@@ -54,9 +55,9 @@ function RestaurantApp() {
   // Dynamic SEO Page Title updates
   useEffect(() => {
     if (currentPath === '/admin') {
-      document.title = 'Acesso da Gerência | Restaurante Pinto Frito';
+      document.title = 'Acesso da Gerência | Pinto Frito';
     } else {
-      document.title = 'Restaurante Pinto Frito – O Frango Mais Crocante & Suculento';
+      document.title = 'Pinto Frito – O Melhor Frango Frito Crocante de SP | Site Oficial';
     }
   }, [currentPath]);
 
@@ -267,6 +268,9 @@ function RestaurantApp() {
           reviews={reviews}
           onAddReview={handleAddReview}
         />
+
+        {/* Semantic FAQ Section for Google SERP Rich Snippets */}
+        <FAQSection />
 
         {/* Location & Google Maps Integration */}
         <GoogleMapsSection />

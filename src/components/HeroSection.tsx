@@ -32,9 +32,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <span>Receita Secreta de 11 Especiarias</span>
             </div>
 
-            {/* Main SEO H1 */}
+            {/* Main SEO H1 - Exact Keyword Match */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1]">
-              O Frango Mais <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500">Crocante & Suculento</span> do Brasil
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500">Pinto Frito</span>: O Frango Mais Crocante & Suculento do Brasil
             </h1>
 
             {/* Subtitle H2 */}

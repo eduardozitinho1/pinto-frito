@@ -23,6 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'cardapio', label: 'Cardápio' },
     { id: 'reservas', label: 'Reservas' },
     { id: 'avaliacoes', label: 'Avaliações' },
+    { id: 'perguntas-frequentes', label: 'Dúvidas' },
     { id: 'localizacao', label: 'Onde Estamos' },
   ];
 
