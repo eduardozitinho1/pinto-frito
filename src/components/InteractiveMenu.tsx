@@ -1,21 +1,33 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Flame, Sparkles, Plus, Clock, Users } from 'lucide-react';
 import { MenuItem, MenuCategory, CartItem } from '../types/restaurant';
 import { DishDetailModal } from './DishDetailModal';
+import { MenuGridSkeleton } from './MenuCardSkeleton';
 
 interface InteractiveMenuProps {
   menuItems: MenuItem[];
   onAddToCart: (cartItem: CartItem) => void;
+  isLoading?: boolean;
 }
 
 export const InteractiveMenu: React.FC<InteractiveMenuProps> = ({
   menuItems,
   onAddToCart,
+  isLoading = false,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<MenuCategory>('todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPopularOnly, setFilterPopularOnly] = useState(false);
   const [activeModalItem, setActiveModalItem] = useState<MenuItem | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  // Smooth loading skeleton on initial mount to simulate high-end progressive rendering
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitializing(false);
+    }, 450);
+    return () => clearTimeout(timer);
+  }, []);
 
   const categories: { id: MenuCategory; label: string; icon: string }[] = [
     { id: 'todos', label: 'Todos os Pratos', icon: '🍗' },
@@ -140,8 +152,10 @@ export const InteractiveMenu: React.FC<InteractiveMenuProps> = ({
         </div>
       </div>
 
-      {/* Menu Grid */}
-      {filteredItems.length === 0 ? (
+      {/* Menu Grid or Skeletons */}
+      {(isLoading || isInitializing) ? (
+        <MenuGridSkeleton count={6} />
+      ) : filteredItems.length === 0 ? (
         <div className="text-center py-16 bg-stone-900/50 rounded-2xl border border-stone-800">
           <p className="text-stone-400 text-base">Nenhum prato encontrado para sua busca.</p>
           <button

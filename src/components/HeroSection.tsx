@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Sparkles, Calendar, ShoppingBag, ArrowRight, ShieldCheck, Flame, Star, MessageCircle } from 'lucide-react';
 import { RESTAURANT_INFO } from '../data/restaurantData';
 import { SocialShareBar } from './SocialShareBar';
@@ -25,7 +26,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Copy & Actions */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-7 space-y-6 text-center lg:text-left"
+          >
             {/* Tagline Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider shadow-sm animate-pulse">
               <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
@@ -101,10 +107,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="pt-2 flex justify-center lg:justify-start">
               <SocialShareBar variant="compact" />
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Column: Hero Visual Asset with Strict SEO alt text */}
-          <div className="lg:col-span-5 relative">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94, y: 25 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-5 relative"
+          >
             <div className="relative mx-auto max-w-md lg:max-w-none">
               {/* Glowing decorative backdrop */}
               <div className="absolute -inset-4 bg-gradient-to-r from-amber-500 to-orange-600 rounded-3xl opacity-30 blur-2xl animate-glow" />
@@ -151,7 +162,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

@@ -12,6 +12,9 @@ import { AdminAuthGate } from './components/AdminAuthGate';
 import { Footer } from './components/Footer';
 import { DemoNoticeProvider } from './context/DemoNoticeContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { OfflineIndicator } from './components/OfflineIndicator';
+import { ScrollRevealSection, StaggerContainer, StaggerItem } from './components/ScrollRevealSection';
+import { AndroidAppModal } from './components/AndroidAppModal';
 
 import {
   INITIAL_MENU_ITEMS,
@@ -29,6 +32,7 @@ function RestaurantApp() {
   const [reviews, setReviews] = useState<CustomerReview[]>(INITIAL_REVIEWS);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isAndroidModalOpen, setIsAndroidModalOpen] = useState(false);
   
   // Real path state for routing
   const [currentPath, setCurrentPath] = useState<string>(() => {
@@ -198,6 +202,7 @@ function RestaurantApp() {
         onOpenCart={() => setIsCartOpen(true)}
         onOpenReservations={() => handleNavigateToSection('reservas')}
         onNavigateToSection={handleNavigateToSection}
+        onOpenAndroidApp={() => setIsAndroidModalOpen(true)}
       />
 
       <main className="flex-1">
@@ -208,10 +213,10 @@ function RestaurantApp() {
           onOpenCart={() => setIsCartOpen(true)}
         />
 
-        {/* Feature Highlights Banner */}
-        <section className="border-y border-stone-800 bg-stone-900/60 py-8 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center sm:text-left">
-            <div className="flex items-center gap-3 justify-center sm:justify-start">
+        {/* Feature Highlights Banner with Staggered Scroll Entrance */}
+        <section className="border-y border-stone-800 bg-stone-900/60 py-8 px-4 sm:px-6 lg:px-8 overflow-hidden">
+          <StaggerContainer className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center sm:text-left" staggerDelay={0.12}>
+            <StaggerItem className="flex items-center gap-3 justify-center sm:justify-start">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
                 <Flame className="w-5 h-5" />
               </div>
@@ -219,9 +224,9 @@ function RestaurantApp() {
                 <strong className="text-white text-xs sm:text-sm block">11 Especiarias</strong>
                 <span className="text-stone-400 text-[11px]">Receita secreta autêntica</span>
               </div>
-            </div>
+            </StaggerItem>
 
-            <div className="flex items-center gap-3 justify-center sm:justify-start">
+            <StaggerItem className="flex items-center gap-3 justify-center sm:justify-start">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
                 <Clock className="w-5 h-5" />
               </div>
@@ -229,9 +234,9 @@ function RestaurantApp() {
                 <strong className="text-white text-xs sm:text-sm block">Reserva Instantânea</strong>
                 <span className="text-stone-400 text-[11px]">Sem filas ou esperas</span>
               </div>
-            </div>
+            </StaggerItem>
 
-            <div className="flex items-center gap-3 justify-center sm:justify-start">
+            <StaggerItem className="flex items-center gap-3 justify-center sm:justify-start">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
                 <UtensilsCrossed className="w-5 h-5" />
               </div>
@@ -239,9 +244,9 @@ function RestaurantApp() {
                 <strong className="text-white text-xs sm:text-sm block">Cardápio Digital</strong>
                 <span className="text-stone-400 text-[11px]">Pedidos com 1 clique</span>
               </div>
-            </div>
+            </StaggerItem>
 
-            <div className="flex items-center gap-3 justify-center sm:justify-start">
+            <StaggerItem className="flex items-center gap-3 justify-center sm:justify-start">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
                 <Award className="w-5 h-5" />
               </div>
@@ -249,32 +254,42 @@ function RestaurantApp() {
                 <strong className="text-white text-xs sm:text-sm block">Nota 4.9 no Google</strong>
                 <span className="text-stone-400 text-[11px]">+2.480 clientes felizes</span>
               </div>
-            </div>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
         </section>
 
-        {/* Interactive Menu Section */}
-        <InteractiveMenu
-          menuItems={menuItems}
-          onAddToCart={handleAddToCart}
-        />
+        {/* Interactive Menu Section with Scroll Reveal */}
+        <ScrollRevealSection amount={0.05}>
+          <InteractiveMenu
+            menuItems={menuItems}
+            onAddToCart={handleAddToCart}
+          />
+        </ScrollRevealSection>
 
-        {/* Table Reservation & Scheduling Section */}
-        <ReservationSection
-          onReservationCreated={handleReservationCreated}
-        />
+        {/* Table Reservation & Scheduling Section with Scroll Reveal */}
+        <ScrollRevealSection amount={0.06}>
+          <ReservationSection
+            onReservationCreated={handleReservationCreated}
+          />
+        </ScrollRevealSection>
 
-        {/* Customer Reviews & Google Ratings */}
-        <ReviewsSection
-          reviews={reviews}
-          onAddReview={handleAddReview}
-        />
+        {/* Customer Reviews & Google Ratings with Scroll Reveal */}
+        <ScrollRevealSection amount={0.06}>
+          <ReviewsSection
+            reviews={reviews}
+            onAddReview={handleAddReview}
+          />
+        </ScrollRevealSection>
 
-        {/* Semantic FAQ Section for Google SERP Rich Snippets */}
-        <FAQSection />
+        {/* Semantic FAQ Section for Google SERP Rich Snippets with Scroll Reveal */}
+        <ScrollRevealSection amount={0.06}>
+          <FAQSection />
+        </ScrollRevealSection>
 
-        {/* Location & Google Maps Integration */}
-        <GoogleMapsSection />
+        {/* Location & Google Maps Integration with Scroll Reveal */}
+        <ScrollRevealSection amount={0.06}>
+          <GoogleMapsSection />
+        </ScrollRevealSection>
       </main>
 
       {/* Cart & Checkout Modal */}
@@ -288,10 +303,20 @@ function RestaurantApp() {
         onOrderCreated={handleOrderCreated}
       />
 
+      {/* Offline Status Toast Indicator */}
+      <OfflineIndicator />
+
       {/* Footer */}
       <Footer
         onNavigateToSection={handleNavigateToSection}
         onOpenReservations={() => handleNavigateToSection('reservas')}
+        onOpenAndroidApp={() => setIsAndroidModalOpen(true)}
+      />
+
+      {/* Android Native & WebAPK Install Modal */}
+      <AndroidAppModal
+        isOpen={isAndroidModalOpen}
+        onClose={() => setIsAndroidModalOpen(false)}
       />
     </div>
   );

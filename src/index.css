@@ -37,9 +37,19 @@
   }
 }
 
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .animate-glow {
   animation: pulseGlow 2.5s infinite;
 }
+
 
 /* ==========================================================================
    Light Mode Color Overrides (Daytime High-Visibility Palette)
@@ -86,6 +96,19 @@ html.light {
 
 [data-theme="light"] .bg-stone-950\/40 {
   background-color: #f5f5f4 !important;
+}
+
+[data-theme="light"] .bg-stone-800,
+[data-theme="light"] .bg-stone-800\/50,
+[data-theme="light"] .bg-stone-800\/60,
+[data-theme="light"] .bg-stone-800\/70,
+[data-theme="light"] .bg-stone-800\/90 {
+  background-color: #e7e5e4 !important;
+}
+
+[data-theme="light"] .bg-stone-700\/40,
+[data-theme="light"] .bg-stone-700\/60 {
+  background-color: #d6d3d1 !important;
 }
 
 /* Header & Navigation */

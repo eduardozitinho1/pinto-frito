@@ -15,10 +15,8 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({
   onClose,
   onAddToCart,
 }) => {
-  if (!isOpen || !item) return null;
-
-  const defaultSpiciness = item.customizationOptions?.spiciness?.[0] || 'Tradicional Crocante';
-  const defaultSauce = item.customizationOptions?.sauces?.[0] || 'Maionese Verde da Casa';
+  const defaultSpiciness = item?.customizationOptions?.spiciness?.[0] || 'Tradicional Crocante';
+  const defaultSauce = item?.customizationOptions?.sauces?.[0] || 'Maionese Verde da Casa';
 
   const [quantity, setQuantity] = useState(1);
   const [selectedSpiciness, setSelectedSpiciness] = useState(defaultSpiciness);
@@ -26,6 +24,8 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({
   const [selectedExtras, setSelectedExtras] = useState<{ name: string; price: number }[]>([]);
   const [notes, setNotes] = useState('');
   const [addedAlert, setAddedAlert] = useState(false);
+
+  if (!isOpen || !item) return null;
 
   const extrasCost = selectedExtras.reduce((sum, extra) => sum + extra.price, 0);
   const unitPrice = item.price + extrasCost;

@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { X, ShoppingBag, Plus, Minus, Trash2, ArrowRight, CheckCircle2, QrCode, Tag, MessageCircle } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { X, ShoppingBag, Plus, Minus, Trash2, ArrowRight, CheckCircle2, QrCode, Tag, MessageCircle, AlertCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CartItem, Order, OrderStatus } from '../types/restaurant';
 import { useDemoNotice } from '../context/DemoNoticeContext';
+import { orderCheckoutSchema, OrderCheckoutFormData, formatPhoneNumber } from '../schemas/formSchemas';
 
 interface CartModalProps {
   isOpen: boolean;
@@ -24,18 +27,37 @@ export const CartModal: React.FC<CartModalProps> = ({
   onOrderCreated,
 }) => {
   const { openDemoNotice } = useDemoNotice();
-  if (!isOpen) return null;
 
-  const [deliveryType, setDeliveryType] = useState<'delivery' | 'retirada' | 'mesa'>('delivery');
-  const [customerName, setCustomerName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [tableNumber, setTableNumber] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('Pix Instantâneo');
   const [couponCode, setCouponCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [couponMessage, setCouponMessage] = useState('');
   const [activeCreatedOrder, setActiveCreatedOrder] = useState<Order | null>(null);
+
+  // react-hook-form with Zod validation
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<OrderCheckoutFormData>({
+    resolver: zodResolver(orderCheckoutSchema),
+    defaultValues: {
+      customerName: '',
+      phone: '',
+      deliveryType: 'delivery',
+      address: '',
+      tableNumber: '',
+      paymentMethod: 'Pix Instantâneo',
+    },
+    mode: 'onTouched',
+  });
+
+  const deliveryType = watch('deliveryType');
+  const paymentMethod = watch('paymentMethod');
+
+  if (!isOpen) return null;
 
   const subtotal = cart.reduce((sum, item) => sum + item.totalItemPrice, 0);
   const deliveryFee = deliveryType === 'delivery' ? (subtotal > 100 ? 0 : 8.00) : 0;
@@ -55,40 +77,37 @@ export const CartModal: React.FC<CartModalProps> = ({
     }
   };
 
-  const handleCheckout = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePhoneInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setValue('phone', formatted, { shouldValidate: true, shouldDirty: true });
+  };
+
+  const onValidCheckout = (data: OrderCheckoutFormData) => {
     if (cart.length === 0) return;
-    if (!customerName.trim() || !phone.trim()) {
-      alert('Por favor informe seu nome e telefone para contato.');
-      return;
-    }
-    if (deliveryType === 'delivery' && !address.trim()) {
-      alert('Por favor informe o endereço completo para entrega.');
-      return;
-    }
 
     const orderId = `PED-${Math.floor(1000 + Math.random() * 9000)}`;
     const newOrder: Order = {
       id: orderId,
-      customerName: customerName.trim(),
-      phone: phone.trim(),
-      deliveryType,
-      address: deliveryType === 'delivery' ? address.trim() : undefined,
-      tableNumber: deliveryType === 'mesa' ? (tableNumber.trim() || 'Mesa não informada') : undefined,
+      customerName: data.customerName.trim(),
+      phone: data.phone.trim(),
+      deliveryType: data.deliveryType,
+      address: data.deliveryType === 'delivery' ? data.address?.trim() : undefined,
+      tableNumber: data.deliveryType === 'mesa' ? (data.tableNumber?.trim() || 'Mesa não informada') : undefined,
       items: [...cart],
       subtotal,
       deliveryFee,
       discount: appliedDiscount,
       total,
-      paymentMethod,
+      paymentMethod: data.paymentMethod,
       status: 'Recebido' as OrderStatus,
-      estimatedMinutes: deliveryType === 'delivery' ? 35 : 20,
+      estimatedMinutes: data.deliveryType === 'delivery' ? 35 : 20,
       createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
     onOrderCreated(newOrder);
     setActiveCreatedOrder(newOrder);
     onClearCart();
+    reset();
 
     try {
       confetti({
@@ -331,7 +350,7 @@ export const CartModal: React.FC<CartModalProps> = ({
                   <button
                     key={type.id}
                     type="button"
-                    onClick={() => setDeliveryType(type.id as any)}
+                    onClick={() => setValue('deliveryType', type.id as any, { shouldValidate: true })}
                     className={`p-2.5 rounded-xl border text-center transition-all ${
                       deliveryType === type.id
                         ? 'border-amber-500 bg-amber-500/10 text-white shadow-sm'
@@ -374,29 +393,42 @@ export const CartModal: React.FC<CartModalProps> = ({
             </div>
 
             {/* Customer Details Form */}
-            <form onSubmit={handleCheckout} className="space-y-4">
+            <form onSubmit={handleSubmit(onValidCheckout)} className="space-y-4" noValidate>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-stone-400 mb-1">Seu Nome *</label>
                   <input
                     type="text"
-                    required
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
+                    {...register('customerName')}
                     placeholder="Ex: João da Silva"
-                    className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-amber-500"
+                    className={`w-full bg-stone-950 border rounded-xl px-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none transition-colors ${
+                      errors.customerName ? 'border-red-500 focus:border-red-500' : 'border-stone-800 focus:border-amber-500'
+                    }`}
                   />
+                  {errors.customerName && (
+                    <p className="mt-1 text-[11px] text-red-400 font-medium flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {errors.customerName.message}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs text-stone-400 mb-1">WhatsApp / Telefone *</label>
                   <input
                     type="tel"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    {...register('phone')}
+                    onChange={handlePhoneInputChange}
                     placeholder="(11) 98765-4321"
-                    className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-amber-500"
+                    className={`w-full bg-stone-950 border rounded-xl px-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none transition-colors ${
+                      errors.phone ? 'border-red-500 focus:border-red-500' : 'border-stone-800 focus:border-amber-500'
+                    }`}
                   />
+                  {errors.phone && (
+                    <p className="mt-1 text-[11px] text-red-400 font-medium flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {errors.phone.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -405,25 +437,38 @@ export const CartModal: React.FC<CartModalProps> = ({
                   <label className="block text-xs text-stone-400 mb-1">Endereço Completo para Entrega *</label>
                   <input
                     type="text"
-                    required
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
+                    {...register('address')}
                     placeholder="Rua, Número, Bairro, Apto/Bloco e Ponto de Referência"
-                    className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-amber-500"
+                    className={`w-full bg-stone-950 border rounded-xl px-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none transition-colors ${
+                      errors.address ? 'border-red-500 focus:border-red-500' : 'border-stone-800 focus:border-amber-500'
+                    }`}
                   />
+                  {errors.address && (
+                    <p className="mt-1 text-[11px] text-red-400 font-medium flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {errors.address.message}
+                    </p>
+                  )}
                 </div>
               )}
 
               {deliveryType === 'mesa' && (
                 <div>
-                  <label className="block text-xs text-stone-400 mb-1">Número da sua Mesa no Salão</label>
+                  <label className="block text-xs text-stone-400 mb-1">Número da sua Mesa no Salão *</label>
                   <input
                     type="text"
-                    value={tableNumber}
-                    onChange={(e) => setTableNumber(e.target.value)}
+                    {...register('tableNumber')}
                     placeholder="Ex: Mesa 04 ou Varanda 02"
-                    className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-amber-500"
+                    className={`w-full bg-stone-950 border rounded-xl px-3 py-2 text-xs text-white placeholder-stone-600 focus:outline-none transition-colors ${
+                      errors.tableNumber ? 'border-red-500 focus:border-red-500' : 'border-stone-800 focus:border-amber-500'
+                    }`}
                   />
+                  {errors.tableNumber && (
+                    <p className="mt-1 text-[11px] text-red-400 font-medium flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      {errors.tableNumber.message}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -435,7 +480,7 @@ export const CartModal: React.FC<CartModalProps> = ({
                     <button
                       key={pm}
                       type="button"
-                      onClick={() => setPaymentMethod(pm)}
+                      onClick={() => setValue('paymentMethod', pm, { shouldValidate: true })}
                       className={`p-2 rounded-xl border text-xs font-semibold transition-all ${
                         paymentMethod === pm
                           ? 'border-amber-500 bg-amber-500/10 text-amber-400'

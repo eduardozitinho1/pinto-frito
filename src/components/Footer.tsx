@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Phone, Clock, Instagram, ExternalLink, ShieldCheck, Flame, UtensilsCrossed } from 'lucide-react';
+import { MapPin, Phone, Clock, Instagram, ExternalLink, ShieldCheck, Flame, UtensilsCrossed, Smartphone } from 'lucide-react';
 import { RESTAURANT_INFO } from '../data/restaurantData';
 import { SocialShareBar } from './SocialShareBar';
 import { useDemoNotice } from '../context/DemoNoticeContext';
@@ -7,11 +7,13 @@ import { useDemoNotice } from '../context/DemoNoticeContext';
 interface FooterProps {
   onNavigateToSection: (sectionId: string) => void;
   onOpenReservations: () => void;
+  onOpenAndroidApp?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   onNavigateToSection,
   onOpenReservations,
+  onOpenAndroidApp,
 }) => {
   const { openDemoNotice } = useDemoNotice();
 
@@ -120,6 +122,17 @@ export const Footer: React.FC<FooterProps> = ({
                   Como Chegar & Estacionamento
                 </button>
               </li>
+              {onOpenAndroidApp && (
+                <li>
+                  <button
+                    onClick={onOpenAndroidApp}
+                    className="text-emerald-400 hover:text-emerald-300 font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                    <span>App Android (APK & WebAPK)</span>
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
 

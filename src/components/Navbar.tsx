@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Calendar, Menu, X, Sun, Moon } from 'lucide-react';
+import { ShoppingBag, Calendar, Menu, X, Sun, Moon, Smartphone } from 'lucide-react';
 import { useDemoNotice } from '../context/DemoNoticeContext';
 import { useTheme } from '../context/ThemeContext';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface NavbarProps {
   cartCount: number;
   onOpenCart: () => void;
   onOpenReservations: () => void;
   onNavigateToSection: (sectionId: string) => void;
+  onOpenAndroidApp?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -15,6 +17,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCart,
   onOpenReservations,
   onNavigateToSection,
+  onOpenAndroidApp,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { openDemoNotice } = useDemoNotice();
@@ -74,6 +77,22 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Android App Button */}
+            {onOpenAndroidApp && (
+              <button
+                onClick={onOpenAndroidApp}
+                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition-all hover:scale-105 cursor-pointer"
+                title="Aplicativo Android (Nativo APK & WebAPK)"
+                aria-label="Abrir opções do aplicativo Android"
+              >
+                <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                <span>App Android</span>
+              </button>
+            )}
+
+            {/* PWA Install Button (App install for instant offline access) */}
+            <PWAInstallButton variant="navbar" />
+
             {/* Theme Switcher Button (Daylight / Night Mode) */}
             <button
               onClick={toggleTheme}
@@ -172,6 +191,24 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           <div className="pt-2 border-t border-stone-800 space-y-2.5">
+            {/* Mobile PWA Install option */}
+            <div className="pb-1">
+              <PWAInstallButton variant="banner" />
+            </div>
+
+            {onOpenAndroidApp && (
+              <button
+                onClick={() => {
+                  onOpenAndroidApp();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer hover:bg-emerald-500/20 transition-all"
+              >
+                <Smartphone className="w-4 h-4 text-emerald-400" />
+                <span>Baixar App Android (APK / WebAPK)</span>
+              </button>
+            )}
+
             <button
               onClick={() => {
                 onOpenReservations();

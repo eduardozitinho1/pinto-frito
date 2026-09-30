@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Calendar, Clock, Users, MapPin, CheckCircle, Sparkles, MessageCircle, AlertCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Reservation } from '../types/restaurant';
 import { useDemoNotice } from '../context/DemoNoticeContext';
+import { reservationSchema, ReservationFormData, formatPhoneNumber } from '../schemas/formSchemas';
 
 interface ReservationSectionProps {
   onReservationCreated: (reservation: Reservation) => void;
@@ -16,18 +19,10 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
   const [selectedTime, setSelectedTime] = useState('20:00');
   const [guests, setGuests] = useState(4);
   const [seatingArea, setSeatingArea] = useState<'Salão Principal Climatizado' | 'Varanda Jardim Pet Friendly' | 'Lounge Bar & Chopp'>('Salão Principal Climatizado');
-  const [occasion, setOccasion] = useState('Jantar com Amigos');
-  const [specialRequests, setSpecialRequests] = useState('');
-  
-  // Contact details
-  const [customerName, setCustomerName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const { openDemoNotice } = useDemoNotice();
 
   // Confirmation state
   const [confirmedReservation, setConfirmedReservation] = useState<Reservation | null>(null);
-  const [errorMsg, setErrorMsg] = useState('');
 
   const timeSlots = [
     { time: '12:00', label: 'Almoço', available: true },
@@ -41,28 +36,39 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
     { time: '21:30', label: 'Jantar', available: true },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg('');
+  // react-hook-form with Zod validation
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ReservationFormData>({
+    resolver: zodResolver(reservationSchema),
+    defaultValues: {
+      customerName: '',
+      phone: '',
+      email: '',
+      occasion: 'Jantar com Amigos',
+      specialRequests: '',
+    },
+    mode: 'onTouched',
+  });
 
-    if (!customerName.trim() || !phone.trim() || !email.trim()) {
-      setErrorMsg('Por favor, preencha seu nome completo, telefone e e-mail para confirmar a reserva.');
-      return;
-    }
-
+  const onValidSubmit = (data: ReservationFormData) => {
     const dateToSave = dateOption === 'Outra data' ? (customDate || 'Data a confirmar') : dateOption;
 
     const newRes: Reservation = {
       id: `RES-${Math.floor(100 + Math.random() * 900)}`,
-      customerName: customerName.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
+      customerName: data.customerName.trim(),
+      email: data.email.trim(),
+      phone: data.phone.trim(),
       date: dateToSave,
       time: selectedTime,
       guests,
       seatingArea,
-      occasion,
-      specialRequests: specialRequests.trim() || undefined,
+      occasion: data.occasion,
+      specialRequests: data.specialRequests?.trim() || undefined,
       status: 'Confirmada',
       createdAt: 'Agora mesmo',
     };
@@ -83,12 +89,14 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
     }
   };
 
+  const handlePhoneInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setValue('phone', formatted, { shouldValidate: true, shouldDirty: true });
+  };
+
   const handleReset = () => {
     setConfirmedReservation(null);
-    setCustomerName('');
-    setPhone('');
-    setEmail('');
-    setSpecialRequests('');
+    reset();
   };
 
   return (
@@ -176,13 +184,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
             </div>
           ) : (
             /* Reservation Form */
-            <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-8">
-              {errorMsg && (
-                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{errorMsg}</span>
-                </div>
-              )}
+            <form onSubmit={handleSubmit(onValidSubmit)} className="max-w-4xl mx-auto space-y-8" noValidate>
 
               {/* Step 1: Date & Guests */}
               <div className="space-y-4">
@@ -338,36 +340,57 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                     <input
                       id="res-name"
                       type="text"
-                      required
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
+                      {...register('customerName')}
                       placeholder="Ex: Carlos Oliveira"
-                      className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 placeholder-stone-600 focus:outline-none focus:border-amber-500"
+                      className={`w-full bg-stone-950 border rounded-xl px-3.5 py-2.5 text-xs text-stone-100 placeholder-stone-600 focus:outline-none transition-colors ${
+                        errors.customerName ? 'border-red-500 focus:border-red-500' : 'border-stone-800 focus:border-amber-500'
+                      }`}
                     />
+                    {errors.customerName && (
+                      <p className="mt-1 text-[11px] text-red-400 font-medium flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        {errors.customerName.message}
+                      </p>
+                    )}
                   </div>
+
                   <div>
                     <label htmlFor="res-phone" className="block text-xs text-stone-400 mb-1">WhatsApp / Telefone *</label>
                     <input
                       id="res-phone"
                       type="tel"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      {...register('phone')}
+                      onChange={handlePhoneInputChange}
                       placeholder="(11) 98765-4321"
-                      className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 placeholder-stone-600 focus:outline-none focus:border-amber-500"
+                      className={`w-full bg-stone-950 border rounded-xl px-3.5 py-2.5 text-xs text-stone-100 placeholder-stone-600 focus:outline-none transition-colors ${
+                        errors.phone ? 'border-red-500 focus:border-red-500' : 'border-stone-800 focus:border-amber-500'
+                      }`}
                     />
+                    {errors.phone && (
+                      <p className="mt-1 text-[11px] text-red-400 font-medium flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        {errors.phone.message}
+                      </p>
+                    )}
                   </div>
+
                   <div>
                     <label htmlFor="res-email" className="block text-xs text-stone-400 mb-1">E-mail para Confirmação *</label>
                     <input
                       id="res-email"
                       type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      {...register('email')}
                       placeholder="carlos@exemplo.com"
-                      className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 placeholder-stone-600 focus:outline-none focus:border-amber-500"
+                      className={`w-full bg-stone-950 border rounded-xl px-3.5 py-2.5 text-xs text-stone-100 placeholder-stone-600 focus:outline-none transition-colors ${
+                        errors.email ? 'border-red-500 focus:border-red-500' : 'border-stone-800 focus:border-amber-500'
+                      }`}
                     />
+                    {errors.email && (
+                      <p className="mt-1 text-[11px] text-red-400 font-medium flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        {errors.email.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -376,8 +399,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                     <label htmlFor="res-occasion" className="block text-xs text-stone-400 mb-1">Ocasião Especial</label>
                     <select
                       id="res-occasion"
-                      value={occasion}
-                      onChange={(e) => setOccasion(e.target.value)}
+                      {...register('occasion')}
                       className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 focus:outline-none focus:border-amber-500"
                     >
                       <option value="Jantar com Amigos">Jantar com Amigos</option>
@@ -388,16 +410,24 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
                       <option value="Outro">Outro momento especial</option>
                     </select>
                   </div>
+
                   <div>
                     <label htmlFor="res-special" className="block text-xs text-stone-400 mb-1">Observações / Cadeirinha de bebê / etc.</label>
                     <input
                       id="res-special"
                       type="text"
-                      value={specialRequests}
-                      onChange={(e) => setSpecialRequests(e.target.value)}
+                      {...register('specialRequests')}
                       placeholder="Ex: levaremos bolo, preferência perto da janela..."
-                      className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 placeholder-stone-600 focus:outline-none focus:border-amber-500"
+                      className={`w-full bg-stone-950 border rounded-xl px-3.5 py-2.5 text-xs text-stone-100 placeholder-stone-600 focus:outline-none transition-colors ${
+                        errors.specialRequests ? 'border-red-500 focus:border-red-500' : 'border-stone-800 focus:border-amber-500'
+                      }`}
                     />
+                    {errors.specialRequests && (
+                      <p className="mt-1 text-[11px] text-red-400 font-medium flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        {errors.specialRequests.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
