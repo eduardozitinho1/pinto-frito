@@ -7,7 +7,6 @@ import { ReservationSection } from './components/ReservationSection';
 import { ReviewsSection } from './components/ReviewsSection';
 import { GoogleMapsSection } from './components/GoogleMapsSection';
 import { FAQSection } from './components/FAQSection';
-import { AdSenseBanner } from './components/AdSenseBanner';
 import { CartModal } from './components/CartModal';
 import { AdminAuthGate } from './components/AdminAuthGate';
 import { Footer } from './components/Footer';
@@ -258,11 +257,6 @@ function RestaurantApp() {
           menuItems={menuItems}
           onAddToCart={handleAddToCart}
         />
-
-        {/* AdSense Monetization Banner */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AdSenseBanner />
-        </div>
 
         {/* Table Reservation & Scheduling Section */}
         <ReservationSection
