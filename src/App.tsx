@@ -11,6 +11,7 @@ import { CartModal } from './components/CartModal';
 import { AdminAuthGate } from './components/AdminAuthGate';
 import { Footer } from './components/Footer';
 import { DemoNoticeProvider } from './context/DemoNoticeContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 import {
   INITIAL_MENU_ITEMS,
@@ -187,7 +188,7 @@ function RestaurantApp() {
   const totalCartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col selection:bg-amber-500 selection:text-stone-950">
+    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col selection:bg-amber-500 selection:text-stone-950 transition-colors duration-300">
       {/* Top Announcement Bar */}
       <SocialShareBar variant="banner" />
 
@@ -298,8 +299,10 @@ function RestaurantApp() {
 
 export default function App() {
   return (
-    <DemoNoticeProvider>
-      <RestaurantApp />
-    </DemoNoticeProvider>
+    <ThemeProvider>
+      <DemoNoticeProvider>
+        <RestaurantApp />
+      </DemoNoticeProvider>
+    </ThemeProvider>
   );
 }

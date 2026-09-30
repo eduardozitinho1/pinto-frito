@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Calendar, Menu, X } from 'lucide-react';
+import { ShoppingBag, Calendar, Menu, X, Sun, Moon } from 'lucide-react';
 import { useDemoNotice } from '../context/DemoNoticeContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface NavbarProps {
   cartCount: number;
@@ -17,6 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { openDemoNotice } = useDemoNotice();
+  const { isDark, toggleTheme } = useTheme();
 
   const navLinks = [
     { id: 'inicio', label: 'Início' },
@@ -33,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-stone-950/90 backdrop-blur-md border-b border-stone-800">
+    <header className="sticky top-0 z-40 bg-stone-950/90 backdrop-blur-md border-b border-stone-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo & Brand Identity */}
@@ -71,7 +73,24 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Theme Switcher Button (Daylight / Night Mode) */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 sm:p-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-800 hover:border-amber-500/40 transition-all hover:scale-105 cursor-pointer relative group flex items-center justify-center text-amber-400"
+              aria-label={isDark ? 'Ativar tema claro (modo diurno)' : 'Ativar tema escuro (modo noturno)'}
+              title={isDark ? 'Mudar para tema claro (Melhor visibilidade de dia)' : 'Mudar para tema escuro'}
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4 text-amber-400 group-hover:rotate-45 transition-transform" />
+              ) : (
+                <Moon className="w-4 h-4 text-amber-500 group-hover:-rotate-12 transition-transform" />
+              )}
+              <span className="sr-only">
+                {isDark ? 'Alternar para tema claro' : 'Alternar para tema escuro'}
+              </span>
+            </button>
+
             {/* Instagram Link Icon */}
             <button
               onClick={() => openDemoNotice({ platform: 'instagram' })}
@@ -135,7 +154,24 @@ export const Navbar: React.FC<NavbarProps> = ({
             ))}
           </nav>
 
-          <div className="pt-4 border-t border-stone-800 space-y-2.5">
+          {/* Mobile Theme Toggle Item */}
+          <div className="pt-3 border-t border-stone-800 flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-stone-200">Aparência</span>
+              <span className="text-[11px] text-stone-400">
+                {isDark ? 'Modo Escuro' : 'Modo Claro (Diurno)'}
+              </span>
+            </div>
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-900 border border-stone-800 text-xs font-bold text-amber-400 cursor-pointer hover:border-amber-500/40 transition-all"
+            >
+              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-amber-500" />}
+              <span>{isDark ? 'Tema Claro' : 'Tema Escuro'}</span>
+            </button>
+          </div>
+
+          <div className="pt-2 border-t border-stone-800 space-y-2.5">
             <button
               onClick={() => {
                 onOpenReservations();

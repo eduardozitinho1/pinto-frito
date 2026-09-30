@@ -3,6 +3,7 @@
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    transition: background-color 0.25s ease, color 0.2s ease;
   }
   
   h1, h2, h3, .font-heading {
@@ -38,4 +39,140 @@
 
 .animate-glow {
   animation: pulseGlow 2.5s infinite;
+}
+
+/* ==========================================================================
+   Light Mode Color Overrides (Daytime High-Visibility Palette)
+   ========================================================================== */
+html[data-theme="light"],
+html.light {
+  color-scheme: light;
+}
+
+[data-theme="light"] body {
+  background-color: #faf8f5 !important;
+  color: #1c1917 !important;
+}
+
+[data-theme="light"] .min-h-screen.bg-stone-950,
+[data-theme="light"] .min-h-screen {
+  background-color: #faf8f5 !important;
+  color: #1c1917 !important;
+}
+
+/* Containers & Surface Cards */
+[data-theme="light"] .bg-stone-950 {
+  background-color: #faf8f5 !important;
+}
+
+[data-theme="light"] .bg-stone-900 {
+  background-color: #ffffff !important;
+  border-color: #e7e5e4 !important;
+  box-shadow: 0 2px 12px -2px rgba(28, 25, 23, 0.05);
+}
+
+[data-theme="light"] .bg-stone-900\/60,
+[data-theme="light"] .bg-stone-900\/80,
+[data-theme="light"] .bg-stone-900\/90 {
+  background-color: #f5f5f4 !important;
+  border-color: #e7e5e4 !important;
+}
+
+[data-theme="light"] .bg-stone-950\/60,
+[data-theme="light"] .bg-stone-950\/80,
+[data-theme="light"] .bg-stone-950\/90 {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+}
+
+[data-theme="light"] .bg-stone-950\/40 {
+  background-color: #f5f5f4 !important;
+}
+
+/* Header & Navigation */
+[data-theme="light"] header {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-bottom-color: #e7e5e4 !important;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] header nav button {
+  color: #44403c !important;
+}
+
+[data-theme="light"] header nav button:hover {
+  color: #d97706 !important;
+}
+
+/* Card Depth & Borders */
+[data-theme="light"] .border-stone-800,
+[data-theme="light"] .border-stone-800\/80 {
+  border-color: #e7e5e4 !important;
+}
+
+[data-theme="light"] .border-stone-700 {
+  border-color: #d6d3d1 !important;
+}
+
+/* Text Hierarchy */
+[data-theme="light"] .text-white {
+  color: #1c1917 !important;
+}
+
+[data-theme="light"] .text-stone-100 {
+  color: #1c1917 !important;
+}
+
+[data-theme="light"] .text-stone-200 {
+  color: #292524 !important;
+}
+
+[data-theme="light"] .text-stone-300 {
+  color: #44403c !important;
+}
+
+[data-theme="light"] .text-stone-400 {
+  color: #57534e !important;
+}
+
+/* Preserve Brand Accent Colors */
+[data-theme="light"] .text-amber-400,
+[data-theme="light"] .text-amber-500 {
+  color: #d97706 !important;
+}
+
+[data-theme="light"] .text-orange-400,
+[data-theme="light"] .text-orange-500 {
+  color: #ea580c !important;
+}
+
+[data-theme="light"] .bg-amber-500\/10 {
+  background-color: #fef3c7 !important;
+  border-color: #fde68a !important;
+}
+
+/* Inputs, Textareas, Selects */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background-color: #ffffff !important;
+  color: #1c1917 !important;
+  border-color: #d6d3d1 !important;
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: #a8a29e !important;
+}
+
+/* Buttons with Amber Gradient keep dark text */
+[data-theme="light"] .bg-gradient-to-r.from-amber-500,
+[data-theme="light"] button.bg-amber-500 {
+  color: #0c0a09 !important;
+}
+
+/* Modals & Dialogs */
+[data-theme="light"] .fixed.inset-0.bg-black\/80,
+[data-theme="light"] .fixed.inset-0.bg-black\/70 {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(4px);
 }
